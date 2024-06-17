@@ -1,3 +1,4 @@
+import asyncio
 from langchain_community.document_loaders import PyMuPDFLoader
 import tiktoken
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -8,10 +9,10 @@ class DataPreprocessor:
         self.docs = None
         self.split_chunks = None
 
-    def load_and_split(self):
+    async def load_and_split(self):
         loader = PyMuPDFLoader(self.pdf_url)
-        self.docs = loader.load()
-        
+        self.docs = await loader.aload()
+
         print(self.docs)
 
         def tiktoken_len(text):
@@ -24,5 +25,5 @@ class DataPreprocessor:
             length_function=tiktoken_len
         )
 
-        self.split_chunks = text_splitter.split_documents(self.docs)
+        self.split_chunks = await asyncio.get_event_loop().run_in_executor(None, text_splitter.split_documents, self.docs)
         return self.split_chunks

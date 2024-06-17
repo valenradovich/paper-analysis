@@ -26,10 +26,10 @@ class RAGChain:
     # def invoke(self, question):
     #     return self.rag_chain.invoke({"question": question})
 
-    def invoke(self, input_data):
+    async def ainvoke(self, input_data):
         question = input_data.get("question", "")
         # Ensure question is a string
         if not isinstance(question, str):
             print(f"Expected a string for question, got {type(question)}")
             return {"error": "Invalid input type"}
-        return self.rag_chain.invoke({"question": question})
+        return await self.rag_chain.ainvoke({"question": question})

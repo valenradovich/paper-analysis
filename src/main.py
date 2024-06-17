@@ -1,4 +1,4 @@
-import argparse
+import asyncio
 import re
 from src.config import *
 from src.data_preprocessing import DataPreprocessor
@@ -19,7 +19,7 @@ def is_valid_paper_url(url):
     ]
     return any(re.match(pattern, url) for pattern in patterns)
 
-def main():
+async def main():
     # Prompt the user for the URL
     pdf_url = input("\nPlease enter the URL of the paper.\n\n Must be: \n* directly to the PDF.\n* arXiv, IEEE Xplore, ACM Digital Library, SpringerLink, or Google Scholar.\n\nURL: ")
 
@@ -29,7 +29,7 @@ def main():
     
     print("\nProcessing the paper...")
     data_preprocessor = DataPreprocessor(pdf_url)
-    split_chunks = data_preprocessor.load_and_split()
+    split_chunks = await data_preprocessor.load_and_split()
 
     embedding_model = EmbeddingModel()
     qdrant_vectorstore = embedding_model.create_vectorstore(split_chunks)
@@ -88,4 +88,4 @@ def main():
         print("Error: The input text is not a valid string.")
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

@@ -11,11 +11,11 @@ from langchain_openai import ChatOpenAI
 def is_valid_paper_url(url):
     """Check if the URL is from a recognized paper source (e.g., arXiv, IEEE Xplore, SpringerLink, etc.)."""
     patterns = [
-        r"https:\/\/arxiv\.org\/pdf\/\d{4}\.\d{4,5}",  # arXiv PDF URL pattern
-        r"https:\/\/scholar\.google\.com\/scholar\?q=([^&]+)",  # Google Scholar URL pattern
-        r"https:\/\/ieeexplore\.ieee\.org\/document\/\d+",  # IEEE Xplore document URL pattern
-        r"https:\/\/dl\.acm\.org\/doi\/abs\/\d{4}\/\d{4}",  # ACM Digital Library DOI URL pattern
-        r"https:\/\/link\.springer\.com\/article\/10\.\d{4}\/s12345-6789-0"  # SpringerLink article URL pattern
+        r"https:\/\/arxiv\.org\/pdf\/\d{4}\.\d{4,5}", 
+        r"https:\/\/scholar\.google\.com\/scholar\?q=([^&]+)", 
+        r"https:\/\/ieeexplore\.ieee\.org\/document\/\d+", 
+        r"https:\/\/dl\.acm\.org\/doi\/abs\/\d{4}\/\d{4}",  
+        r"https:\/\/link\.springer\.com\/article\/10\.\d{4}\/s12345-6789-0" 
     ]
     return any(re.match(pattern, url) for pattern in patterns)
 
@@ -30,16 +30,22 @@ async def main():
     print("\nProcessing the paper...")
     data_preprocessor = DataPreprocessor(pdf_url)
     split_chunks = await data_preprocessor.load_and_split()
+    print("Paper processed successfully.")
 
+    print("\nCreating the vectorstore...")
     embedding_model = EmbeddingModel()
-    qdrant_vectorstore = embedding_model.create_vectorstore(split_chunks)
+    qdrant_vectorstore = await embedding_model.create_vectorstore(split_chunks)
+    first_chunk_content = embedding_model.get_first_chunk()
     print("Vectorstore created successfully.")
     
+    print("\nInitializing the RAGChain...")
     rag_chain = RAGChain(qdrant_vectorstore)
 
-    tools = Tools(rag_chain)
+    print("Initilizing the tools...")
+    tools = Tools(rag_chain, first_chunk_content)
     structured_tools = tools.create_structured_tools()
 
+    print("Initializing the agent...")
     llm = ChatOpenAI(temperature=0.0)
     agent = Agent(llm, structured_tools)
 
@@ -77,7 +83,7 @@ async def main():
     \n- **Strengthening and Application of Results:**
     \n- **Open Problems for Further Research:**
 
-    The review should be written in markdown format and saved as a file with the paper title as the filename.
+    When the review is formulated, write in markdown format and saved as a file with the paper title as the filename using 'write_markdown_file' tool.
     """
     
     # Ensure input_text is a plain string

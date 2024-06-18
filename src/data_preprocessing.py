@@ -13,8 +13,6 @@ class DataPreprocessor:
         loader = PyMuPDFLoader(self.pdf_url)
         self.docs = await loader.aload()
 
-        print(self.docs)
-
         def tiktoken_len(text):
             tokens = tiktoken.encoding_for_model("gpt-3.5-turbo").encode(text)
             return len(tokens)

@@ -82,7 +82,7 @@ async def main():
     
     # Ensure input_text is a plain string
     if isinstance(input_text, str):
-        output = agent.execute(input_text)
+        output = await agent.execute(input_text)
         print(output['output'])
     else:
         print("Error: The input text is not a valid string.")

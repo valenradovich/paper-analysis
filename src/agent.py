@@ -1,3 +1,4 @@
+import asyncio
 from langchain_openai import ChatOpenAI
 from langchain.agents import AgentExecutor, create_tool_calling_agent
 from langchain_core.prompts import ChatPromptTemplate
@@ -20,5 +21,5 @@ class Agent:
         self.agent = create_tool_calling_agent(llm, tools, self.prompt)
         self.agent_executor = AgentExecutor(agent=self.agent, tools=tools, verbose=True)
 
-    def execute(self, input_text):
-        return self.agent_executor.invoke({"input": input_text})
+    async def execute(self, input_text):
+        return await self.agent_executor.ainvoke({"input": input_text})

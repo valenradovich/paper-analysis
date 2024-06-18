@@ -1,3 +1,4 @@
+import asyncio
 from typing import Annotated
 from langchain_openai import ChatOpenAI
 from langchain.tools import StructuredTool
@@ -11,13 +12,13 @@ class Tools:
         with open(f"documents/{filename}.md", "w") as f:
             f.write(content)
 
-    def retrieve_paper_title(self):
+    async def retrieve_paper_title(self):
         """Returns the paper title to use later"""
-        return self.rag_chain.invoke({"question": "Based on the first chunk/doc, what's the paper title?. Retrieve it as string without any adittional word."})
+        return await self.rag_chain.ainvoke({"question": "Based on the first chunk/doc, what's the paper title?. Retrieve it as string without any adittional word."})
 
-    def retrieve_information(self, query: Annotated[str, "query to ask the retrieve information tool"], paper_title: Annotated[str, 'title of the paper']):
+    async def retrieve_information(self, query: Annotated[str, "query to ask the retrieve information tool"], paper_title: Annotated[str, 'title of the paper']):
         """Use Retrieval Augmented Generation to retrieve information about the paper."""
-        return self.rag_chain.invoke({"question": query})
+        return await self.rag_chain.ainvoke({"question": query})
 
     def create_structured_tools(self):
         retrieve_paper_title = StructuredTool.from_function(
